@@ -1,0 +1,40 @@
+Class "Object"
+{
+    Constructor Should Contain/Do{
+
+        Form
+        {
+            triangle{
+                each point
+                relative pivot point
+            }
+
+            circle{
+                position/pivot point
+                radians
+            }
+
+            rectangle{
+                position
+                width, height
+                relative pivot point
+            }
+
+            object "spawns" at pivot point
+        }
+
+        Color
+
+        Mass
+
+        Elastisity
+
+        General hitbox that is based on the futherst points
+    }
+
+    //Called upon when the Objects general hitbox collides with another
+    Collision function{
+        Check what kind of object hit
+    }
+
+}

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "4M6jLK1+WVg=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\jack.gissle\\Desktop\\Prog !\\SunTzueOnceSaid\\Something\\Something.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\jack.gissle\\.nuget\\packages\\raylib-cs\\7.0.1\\raylib-cs.7.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
