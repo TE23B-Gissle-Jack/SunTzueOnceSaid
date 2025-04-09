@@ -6,8 +6,8 @@ Raylib.SetTargetFPS(60);
 int screenHeight = Raylib.GetScreenHeight();
 int screenWidth = Raylib.GetScreenWidth();
 
-ArmSegment arm = new ArmSegment(new(400,400),100, null,1);
-ArmSegment arm2 = new ArmSegment(new(400,400),100, arm,2);
+ArmSegment arm = new ArmSegment(new(400,400),100, null,1,"parent");
+ArmSegment arm2 = new ArmSegment(new(400,400),100, arm,2,"child");
 
 while (!Raylib.WindowShouldClose())
 {

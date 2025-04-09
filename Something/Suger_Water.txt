@@ -38,3 +38,18 @@ Class "Object"
     }
 
 }
+
+
+
+
+
+
+double part1 = 2 * Math.Sin(rotation - conected.rotation);
+                double part2 = velocity * velocity * leangth * (mass + conected.mass);
+                double part3 = gravity * (mass + conected.mass) * Math.Cos(rotation);
+                double part4 = conected.velocity * conected.velocity * conected.leangth * conected.mass * Math.Cos(rotation - conected.rotation);
+                double fullPart = part1 * (part2 + part3 + part4);
+
+                double divider = conected.leangth * (2 * mass * conected.mass - conected.mass * Math.Cos(2 * rotation - 2 * conected.rotation));
+
+                acelaration = (float)(fullPart/divider);
