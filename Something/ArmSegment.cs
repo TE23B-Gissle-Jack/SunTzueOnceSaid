@@ -9,14 +9,18 @@ public class ArmSegment
     KeyboardKey[] controlset;
     string role;
 
-    float gravity = -0.15f;
+    List<Vector2> trail = new();
+    const int maxTrailLength = 100;
+
+    float g = -0.15f; //gravity
     float dragforce = 0.99f;
 
     public Vector2 position;
-    Vector2 orgin;
+    public Vector2 orgin;
     int leangth;
-    float velocity;
-    float acelaration;
+    public double velocity;
+    public double acelaration;
+    double newAcelaration;
 
     public float mass = 10;
 
@@ -30,9 +34,11 @@ public class ArmSegment
     {
         this.leangth = leangth;
         this.conected = conected;
+        this.role = role;
         if (conected != null)
         {
             orgin = conected.position;
+            color = Color.Gold;
 
             //makes the parent have this a conected
             conected.conected = this;
@@ -45,6 +51,46 @@ public class ArmSegment
         }
         else controlset = [KeyboardKey.Left, KeyboardKey.Right];
     }
+    public void Calc()
+    {
+        if (conected == null)
+        {
+            acelaration = (float)(g * Math.Sin(rotation) / leangth);
+        }
+        else
+        {
+            if (role == "parent")
+            {
+                double m2 = conected.mass, o2 = conected.rotation, v2 = conected.velocity, r2 = conected.leangth;
+                double m1 = mass, o1 = rotation, v1 = velocity, r1 = leangth;
+
+                double part1 = -g * (2 * m1 + m2) * Math.Sin(o1);
+                double part2 = -m2 * g * Math.Sin(o1 - 2 * o2);
+                double part3 = -2 * Math.Sin(o1 - o2) * m2;
+                double part4 = v2 * v2 * r2 + v1 * v1 * r1 * Math.Cos(o1 - o2);
+                double fullPart = part1 + part2 + part3 * part4;
+
+                double divider = r1 * (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2));
+
+                newAcelaration = (-1) * (float)(fullPart / divider);
+            }
+            else if(role=="child")
+            {
+                double m1 = conected.mass, o1 = conected.rotation, v1 = conected.velocity, r1 = conected.leangth;
+                double m2 = mass, o2 = rotation, v2 = velocity, r2 = leangth;
+
+                double part1 = 2 * Math.Sin(o1 - o2);
+                double part2 = v1 * v1 * r1 * (m1 + m2);
+                double part3 = g * (m1 + m2) * Math.Cos(o1);
+                double part4 = v2 * v2 * r2 * m2 * Math.Cos(o1 - o2);
+                double fullPart = part1 * (part2 + part3 + part4);
+
+                double divider = r2 * ((2 * m1) + m2 - (m2 * Math.Cos(2 * o1 - 2 * o2)));
+
+                newAcelaration = (-1) * (float)(fullPart / divider);
+            }
+        }
+    }
 
     public void Update()
     {
@@ -53,57 +99,54 @@ public class ArmSegment
             orgin = conected.position;
         }
 
-        if (conected == null)
+        acelaration = newAcelaration;
+
+        if (Raylib.IsKeyDown(controlset[1]))
         {
-            acelaration = (float)(gravity * Math.Sin(rotation) / leangth);
-            if (Raylib.IsKeyDown(controlset[1]))
-            {
-                acelaration += 0.001f;
-            }
-            else if (Raylib.IsKeyDown(controlset[0]))
-            {
-                acelaration -= 0.001f;
-            }
+            acelaration += 0.001f;
         }
-        else
+        else if (Raylib.IsKeyDown(controlset[0]))
         {
-            if (role == "parent")
-            {
-                double part1 = -gravity * (2 * mass + conected.mass) * Math.Sin(rotation);
-                double part2 = -conected.mass * gravity * Math.Sin(rotation - 2 * conected.rotation);
-                double part3 = -2 * Math.Sin(rotation - conected.rotation) * conected.mass;
-                double part4 = conected.velocity * conected.velocity * conected.leangth + velocity * velocity * leangth * Math.Cos(rotation - conected.rotation);
-                double fullPart = part1 + part2 + part3 * part4;
-
-                double divider = leangth * (2 * mass + conected.mass - conected.mass * Math.Cos(2 * rotation - 2 * conected.rotation));
-
-                acelaration = (float)(fullPart / divider);
-            }
-            else
-            {
-                double part1 = 2 * Math.Sin(conected.rotation-rotation);
-                double part2 = conected.velocity * conected.velocity * conected.leangth * (conected.mass + mass);
-                double part3 = gravity * (conected.mass + mass) * Math.Cos(conected.rotation);
-                double part4 = velocity * velocity * leangth * mass * Math.Cos(conected.rotation - rotation);
-                double fullPart = part1 * (part2 + part3 + part4);
-
-                double divider = leangth * (2 * conected.mass * mass - mass * Math.Cos(2 * conected.rotation - 2 * rotation));
-
-                acelaration = (float)(fullPart/divider);
-            }
+            acelaration -= 0.001f;
         }
 
         velocity += acelaration;
         rotation += velocity;
 
-        //velocity *= dragforce;
+        velocity *= dragforce;
 
 
         position.X = (float)(leangth * Math.Sin(rotation) + orgin.X);
         position.Y = (float)(leangth * Math.Cos(rotation) + orgin.Y);
+
+        trail.Add(position);
+
+        if (trail.Count > maxTrailLength)
+            trail.RemoveAt(0); // Keep the trail short and sweet
     }
     public void Draw()
     {
+        if(role=="child")Trail();
+
         Raylib.DrawLineEx(orgin, position, 10, color);
+        Raylib.DrawCircleV(orgin, 10, Color.Pink);
+        Raylib.DrawCircleV(position, 10, Color.Red);
+
+
+        void Trail()
+        {
+            for (int i = 1; i < trail.Count; i++)
+        {
+            float t = i/ trail.Count; // 0..1 fade
+            float r = (int)t*255;
+            float g = t*255-255;
+            float b = 255;
+            //Color fade = new Color (r, g, b, 255 * t * 0.4f);
+            Color fade = new Color (r, 10, 0); // 
+            Raylib.DrawLineEx(trail[i - 1], trail[i],5, fade);
+        }
+        }
     }
 }
+
+
