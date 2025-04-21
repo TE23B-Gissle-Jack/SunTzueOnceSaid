@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using System.Numerics;
+using Raylib_cs;
 using Something;
 
 Raylib.InitWindow(1000,1000, "Slap");
@@ -8,10 +9,16 @@ int screenWidth = Raylib.GetScreenWidth();
 
 List<ArmSegment[]> arms = new List<ArmSegment[]>();
 
-for (int i = 0; i < 1; i++)
+for (int i = 0; i < 40; i++)
 {
-    ArmSegment arm = new ArmSegment(new(400,400),100, null,1,"parent");
-    ArmSegment arm2 = new ArmSegment(new(400,400),100, arm,2,"child");
+    int armLeangth = 100;
+    int x = Random.Shared.Next(armLeangth*2,screenWidth-armLeangth*2);
+    int y = Random.Shared.Next(armLeangth*2,screenHeight-armLeangth*2);
+
+    Vector2 position = new Vector2(x,y);
+
+    ArmSegment arm = new ArmSegment(position,100, null,1,"parent");
+    ArmSegment arm2 = new ArmSegment(position,100, arm,2,"child");
 
     arms.Add([arm,arm2]);
 }

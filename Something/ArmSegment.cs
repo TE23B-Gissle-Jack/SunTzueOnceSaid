@@ -10,7 +10,7 @@ public class ArmSegment
     string role;
 
     List<Vector2> trail = new();
-    const int maxTrailLength = 100;
+    const int maxTrailLength = 500;
 
     float g = -0.15f; //gravity
     float dragforce = 0.99f;
@@ -22,11 +22,13 @@ public class ArmSegment
     public double acelaration;
     double newAcelaration;
 
+    int[] colors = new int[3];
+
     public float mass = 10;
 
     public ArmSegment conected;
 
-    public double rotation = Math.PI / Random.Shared.Next(1, 6);
+    public double rotation = Random.Shared.Next(10);
 
     Color color = Color.Green;
 
@@ -35,16 +37,22 @@ public class ArmSegment
         this.leangth = leangth;
         this.conected = conected;
         this.role = role;
+        while (!colors.Contains(1))
+        {
+            colors = [Random.Shared.Next(2),Random.Shared.Next(2),Random.Shared.Next(2)];
+        }
+        
         if (conected != null)
         {
-            orgin = conected.position;
+            orgin = conected.position;//sets the parents moving point as orgin of this child
             color = Color.Gold;
 
-            //makes the parent have this a conected
+            //makes the parent have this as conected
             conected.conected = this;
         }
-        else this.orgin = orgin;
+        else this.orgin = orgin; //if this is the orgin pendjulum then the orgin point is fixed
 
+        //sets the controls
         if (controls == 1)
         {
             controlset = [KeyboardKey.A, KeyboardKey.D];
@@ -53,7 +61,7 @@ public class ArmSegment
     }
     public void Calc()
     {
-        if (conected == null)
+        if (conected == null)//if this is not double pengulum
         {
             acelaration = (float)(g * Math.Sin(rotation) / leangth);
         }
@@ -74,7 +82,7 @@ public class ArmSegment
 
                 newAcelaration = (-1) * (float)(fullPart / divider);
             }
-            else if(role=="child")
+            else if (role == "child")
             {
                 double m1 = conected.mass, o1 = conected.rotation, v1 = conected.velocity, r1 = conected.leangth;
                 double m2 = mass, o2 = rotation, v2 = velocity, r2 = leangth;
@@ -113,7 +121,7 @@ public class ArmSegment
         velocity += acelaration;
         rotation += velocity;
 
-        velocity *= dragforce;
+        //velocity *= dragforce; //slows down with time
 
 
         position.X = (float)(leangth * Math.Sin(rotation) + orgin.X);
@@ -121,30 +129,30 @@ public class ArmSegment
 
         trail.Add(position);
 
-        if (trail.Count > maxTrailLength)
-            trail.RemoveAt(0); // Keep the trail short and sweet
+        if (trail.Count > maxTrailLength)trail.RemoveAt(0); // Keep the trail short and sweet
+            
     }
     public void Draw()
     {
-        if(role=="child")Trail();
+        if (role == "child") Trail();
 
-        Raylib.DrawLineEx(orgin, position, 10, color);
-        Raylib.DrawCircleV(orgin, 10, Color.Pink);
-        Raylib.DrawCircleV(position, 10, Color.Red);
+        // Raylib.DrawLineEx(orgin, position, 10, color);
+        // Raylib.DrawCircleV(orgin, 10, Color.Pink);
+        // Raylib.DrawCircleV(position, 10, Color.Red);
 
 
         void Trail()
         {
             for (int i = 1; i < trail.Count; i++)
-        {
-            float t = i/ trail.Count; // 0..1 fade
-            float r = (int)t*255;
-            float g = t*255-255;
-            float b = 255;
-            //Color fade = new Color (r, g, b, 255 * t * 0.4f);
-            Color fade = new Color (r, 10, 0); // 
-            Raylib.DrawLineEx(trail[i - 1], trail[i],5, fade);
-        }
+            {
+                float t = (i - 1) / (float)(trail.Count - 1); // 0..1 fade
+                byte r = (byte)(t * 255*colors[0]);
+                byte g = (byte)(t * 255*colors[1]);
+                byte b = (byte)(t * 255*colors[2]);
+                Color fade = new Color (r, g, b, (byte)(255 * t));
+
+                Raylib.DrawLineEx(trail[i - 1], trail[i], 5, fade);
+            }
         }
     }
 }
