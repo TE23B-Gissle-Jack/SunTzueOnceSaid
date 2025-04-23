@@ -10,7 +10,7 @@ public class ArmSegment
     string role;
 
     List<Vector2> trail = new();
-    const int maxTrailLength = 500;
+    const int maxTrailLength = 300;
 
     float g = -0.15f; //gravity
     float dragforce = 0.99f;
@@ -22,7 +22,7 @@ public class ArmSegment
     public double acelaration;
     double newAcelaration;
 
-    int[] colors = new int[3];
+    int[] trailColors = new int[6];
 
     public float mass = 10;
 
@@ -32,16 +32,22 @@ public class ArmSegment
 
     Color color = Color.Green;
 
+    private Vector2 parentPosition;
+    public bool showArm;
+
     public ArmSegment(Vector2 orgin, int leangth, ArmSegment conected, int controls, string role)
     {
         this.leangth = leangth;
         this.conected = conected;
         this.role = role;
-        while (!colors.Contains(1))
+        while (!trailColors.Contains(1))
         {
-            colors = [Random.Shared.Next(2),Random.Shared.Next(2),Random.Shared.Next(2)];
+            for (int i = 0; i < trailColors.Length; i++)
+            {
+                trailColors[i] = Random.Shared.Next(2);// 1 or 0
+            }
         }
-        
+
         if (conected != null)
         {
             orgin = conected.position;//sets the parents moving point as orgin of this child
@@ -102,12 +108,17 @@ public class ArmSegment
 
     public void Update()
     {
-        if (role == "child")
+        //does this if double pengulum
+        if (conected != null)
         {
-            orgin = conected.position;
+            parentPosition = conected.position;
+            acelaration = newAcelaration;
         }
 
-        acelaration = newAcelaration;
+        if (role == "child")
+        {
+            orgin = parentPosition;
+        }
 
         if (Raylib.IsKeyDown(controlset[1]))
         {
@@ -116,6 +127,10 @@ public class ArmSegment
         else if (Raylib.IsKeyDown(controlset[0]))
         {
             acelaration -= 0.001f;
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
+        {
+            showArm = !showArm;
         }
 
         velocity += acelaration;
@@ -129,27 +144,30 @@ public class ArmSegment
 
         trail.Add(position);
 
-        if (trail.Count > maxTrailLength)trail.RemoveAt(0); // Keep the trail short and sweet
-            
+        if (trail.Count > maxTrailLength) trail.RemoveAt(0); // Keep the trail short and sweet
+
     }
     public void Draw()
     {
-        if (role == "child") Trail();
+        if (role == "child"||conected==null) Trail();
 
-        // Raylib.DrawLineEx(orgin, position, 10, color);
-        // Raylib.DrawCircleV(orgin, 10, Color.Pink);
-        // Raylib.DrawCircleV(position, 10, Color.Red);
-
+        if (showArm)
+        {
+            Raylib.DrawLineEx(orgin, position, 10, color);
+            Raylib.DrawCircleV(orgin, 10, Color.Pink);
+            Raylib.DrawCircleV(position, 10, Color.Red);
+        }
 
         void Trail()
         {
             for (int i = 1; i < trail.Count; i++)
             {
                 float t = (i - 1) / (float)(trail.Count - 1); // 0..1 fade
-                byte r = (byte)(t * 255*colors[0]);
-                byte g = (byte)(t * 255*colors[1]);
-                byte b = (byte)(t * 255*colors[2]);
-                Color fade = new Color (r, g, b, (byte)(255 * t));
+                byte r = (byte)(t * 255 * trailColors[0] + (255 - 255 * trailColors[1]));
+                byte g = (byte)(t * 255 * trailColors[2] + (255 - 255 * trailColors[3]));
+                byte b = (byte)(t * 255 * trailColors[4] + (255 - 255 * trailColors[5]));
+
+                Color fade = new Color(r, g, b, (byte)(255 * t));
 
                 Raylib.DrawLineEx(trail[i - 1], trail[i], 5, fade);
             }
