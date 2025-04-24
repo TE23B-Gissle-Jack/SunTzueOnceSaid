@@ -7,12 +7,10 @@ Raylib.SetTargetFPS(60);
 int screenHeight = Raylib.GetScreenHeight();
 int screenWidth = Raylib.GetScreenWidth();
 
-PendjulumSim sim1 = new PendjulumSim(0, 100, new(screenWidth, screenHeight), true,null);
-Balls hugo = new Balls(1,2);
+List<Trail> trailList = new List<Trail>();
 
-Ball ball = new Ball(10, new(400, 400));
-ArmSegment aaa = new ArmSegment(ball.position, 50, null, 1, "parent");
-ArmSegment bbb = new ArmSegment(aaa.position, 50, aaa, 1, "child");
+PendjulumSim sim1 = new PendjulumSim(0, 100, new(screenWidth, screenHeight), true, null, trailList);
+Balls hugo = new Balls(1, 2,trailList);
 
 
 while (!Raylib.WindowShouldClose())
@@ -23,30 +21,29 @@ while (!Raylib.WindowShouldClose())
     sim1.Update();
     hugo.update();
 
-    // ball.Update();
-    // ball.Draw();
-
-    // aaa.orgin = ball.position;
-    // aaa.Calc();
-    // bbb.Calc();
-    // aaa.Update();
-    // aaa.Draw();
-    // bbb.Update();
-    // bbb.Draw();
+    DrawTrails();
 
     Raylib.EndDrawing();
 }
 
+void DrawTrails()
+{
+    for (int i = 0; i < trailList.Count; i++)
+    {
+        trailList[i].Draw();
+    }
+}
+
 public class PendjulumSim
 {
-    List<ArmSegment[]> arms = new List<ArmSegment[]>();
+    public List<ArmSegment[]> arms = new List<ArmSegment[]>();
     bool paused = false;
 
     public List<Vector2> orgins;
 
-    public PendjulumSim(int amt, int leangth, Vector2 screen, bool random,List<Vector2> og)
+    public PendjulumSim(int amt, int leangth, Vector2 screen, bool random, List<Vector2> og, List<Trail> trailList)
     {
-        orgins=og;
+        orgins = og;
         for (int i = 0; i < amt; i++)
         {
             Vector2 position;
@@ -63,8 +60,8 @@ public class PendjulumSim
 
 
 
-            ArmSegment arm = new ArmSegment(position, 100, null, 1, "parent");
-            ArmSegment arm2 = new ArmSegment(position, 100, arm, 2, "child");
+            ArmSegment arm = new ArmSegment(position, 100, null, 1, "parent", trailList);
+            ArmSegment arm2 = new ArmSegment(position, 100, arm, 2, "child", trailList);
 
             arms.Add([arm, arm2]);
         }
@@ -79,7 +76,7 @@ public class PendjulumSim
 
         for (int i = 0; i < arms.Count; i++)
         {
-            if (orgins!=null)
+            if (orgins != null)
             {
                 arms[i][0].orgin = orgins[i];
             }
@@ -113,30 +110,38 @@ public class Balls
     List<Vector2> ballArms = new List<Vector2>();
     PendjulumSim orbits;
 
-    public Balls(int amt, int armCount)
+    public Balls(int amt, int armCount, List<Trail> trailList)
     {
         for (int i = 0; i < amt; i++)
         {
-            balls.Add(new Ball(10, new(Random.Shared.Next(1000), Random.Shared.Next(400))));
+            balls.Add(new Ball(10, new(Random.Shared.Next(1000), Random.Shared.Next(400)),trailList));
             for (int j = 0; j < armCount; j++)
             {
                 ballArms.Add(balls[i].position);
             }
         }
-        orbits = new PendjulumSim(armCount*amt, 50, new(1000, 1000), false, ballArms);
+        orbits = new PendjulumSim(armCount * amt, 50, new(1000, 1000), false, ballArms,trailList);
     }
     public void update()
     {
         for (int i = 0; i < balls.Count; i++)
         {
             balls[i].Update();
-            for (int j = 0; j < ballArms.Count/balls.Count; j++)
+            for (int j = 0; j < ballArms.Count / balls.Count; j++)
             {
+                if ((ballArms[i].X-balls[i].position.X)>100)
+                {
+                    for (int k = 0; k < orbits.arms.Count; k++)
+                    {
+                        orbits.arms[k][1].trail.Add(new Vector2(9999,-9999));
+                        orbits.arms[k][1].trail.Add(new Vector2(-200,-9999));
+                    }
+                }
                 ballArms.RemoveAt(0);
                 ballArms.Add(balls[i].position);
             }
         }
-        
+
         orbits.orgins = ballArms;
         orbits.Update();
         Draw();
