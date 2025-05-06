@@ -14,13 +14,11 @@ public class Ball
     Color color;
     int size;
 
-    // List<Vector2> trail = new();
-    // int maxTrailLength = 300;
-    // int[] trailColors = new int[6];
+    Vector2 screen;
 
     Trail trail;
 
-    public Ball(int radius, Vector2 location,List<Trail> trailList)
+    public Ball(int radius, Vector2 location,List<Trail> trailList, Vector2 window)
     {
         size = radius;
         position = location;
@@ -29,6 +27,8 @@ public class Ball
         trail = new Trail(size);
         trailList.Add(trail);
         color = new Color(0,0,0,0);
+
+        screen = window;
     }
 
     public void Update()
@@ -36,14 +36,14 @@ public class Ball
         velcotiy.Y += gravity;
         position += velcotiy;
 
-        if (position.Y > 1000 - size)
+        if (position.Y > screen.Y - size)
         {
             velcotiy.Y = -velcotiy.Y;
-            position.Y = 1000-size;
+            position.Y = screen.Y-size;
         }
-        if (position.X > 1200 + size)
+        if (position.X > screen.X*1.1 + size)
         {
-            position.X = -100;
+            position.X = -200;
             trail.Add(position+new Vector2(9999,-9999));
             trail.Add(position+new Vector2(-200,-9999));
         }

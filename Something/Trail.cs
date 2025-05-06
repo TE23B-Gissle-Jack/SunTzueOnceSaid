@@ -39,6 +39,8 @@ public class Trail
     {
         for (int i = 1; i < trail.Count; i++)
         {
+            if (TrailBreak(trail[i],trail[i-1])) continue;
+
             float t = (i - 1) / (float)(trail.Count - 1); // 0..1 fade
             byte r = (byte)(t * 255 * trailColors[0] + (255 - 255 * trailColors[1]));
             byte g = (byte)(t * 255 * trailColors[2] + (255 - 255 * trailColors[3]));
@@ -48,5 +50,21 @@ public class Trail
 
             Raylib.DrawLineEx(trail[i - 1], trail[i], size, fade);
         }
+    }
+
+    public bool TrailBreak(Vector2 point1, Vector2 point2)
+    {
+        Vector2 case1 = new (9999,-9999);
+
+        if (point1 == case1 || point2 == case1)
+        {
+            return true;
+        }
+        if (Vector2.Distance(point1,point2)>200)
+        {
+            return true;
+        }
+
+        return false;
     }
 }
