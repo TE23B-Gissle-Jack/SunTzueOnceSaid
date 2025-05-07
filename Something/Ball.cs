@@ -6,18 +6,23 @@ namespace Something;
 
 public class Ball
 {
+    //constant acceleration
     float gravity = 0.1f;
 
     public Vector2 position;
     Vector2 velcotiy;
 
     Color color;
+    //radius for the ball
     int size;
 
+    //screen size
     Vector2 screen;
 
+    //this balls trail
     Trail trail;
 
+    //constructor
     public Ball(int radius, Vector2 location,List<Trail> trailList, Vector2 window)
     {
         size = radius;
@@ -26,49 +31,42 @@ public class Ball
 
         trail = new Trail(size);
         trailList.Add(trail);
-        color = new Color(0,0,0,0);
+        color = new Color(0,0,0,0);//lazy
 
         screen = window;
     }
 
     public void Update()
     {
+        //increses the velocity downward by gravity amount
         velcotiy.Y += gravity;
+        //changes position based on velocity
         position += velcotiy;
 
+        //checks if any part of the ball tuches bottom of screen
         if (position.Y > screen.Y - size)
         {
+            //inverts the velocity
             velcotiy.Y = -velcotiy.Y;
+            //puts the ball at the botton of the screen, in case it was going to fast and past it
             position.Y = screen.Y-size;
         }
+        //checks if the ball is a bit past the border of the screen
         if (position.X > screen.X*1.1 + size)
         {
+            //takes it to the other side, outside the screen
             position.X = -200;
+            //gets its trail out of the way
             trail.Add(position+new Vector2(9999,-9999));
-            trail.Add(position+new Vector2(-200,-9999));
+            //trail.Add(position+new Vector2(-200,-9999));
         }
-
         trail.update();
+        // adds the curent position to the trail
         trail.Add(position);
     }
+    //draws the ball
     public void Draw()
     {
         Raylib.DrawCircleV(position, size, color);
-        // Trail();
     }
-
-    // void Trail()
-    // {
-    //     for (int i = 1; i < trail.Count; i++)
-    //     {
-    //         float t = (i - 1) / (float)(trail.Count - 1); // 0..1 fade
-    //         byte r = (byte)(t * 255 * trailColors[0] + (255 - 255 * trailColors[1]));
-    //         byte g = (byte)(t * 255 * trailColors[2] + (255 - 255 * trailColors[3]));
-    //         byte b = (byte)(t * 255 * trailColors[4] + (255 - 255 * trailColors[5]));
-
-    //         Color fade = new Color(r, g, b, (byte)(255 * t));
-
-    //         Raylib.DrawLineEx(trail[i - 1], trail[i], size, fade);
-    //     }
-    // }
 }
