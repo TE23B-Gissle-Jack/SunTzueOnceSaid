@@ -13,7 +13,7 @@ public class PendjulumSim
     bool paused = false;
 
     //holds the origin points for the first arm of each pendulum pair
-    public List<Vector2> orgins;
+    public List<Vector2> orgins = new List<Vector2>();
 
     Vector2 screen;
     List<Trail> trailList;
@@ -23,7 +23,7 @@ public class PendjulumSim
     public PendjulumSim(int amt, int leangth, Vector2 screen, bool random, List<Vector2> orgins, List<Trail> trailList)
     {
         //stores the origins provided when creating the simulation
-        this.orgins = orgins;
+        if(orgins!=null)this.orgins = orgins;
         this.screen = screen;
         this.trailList = trailList;
         this.random = random;
@@ -48,7 +48,7 @@ public class PendjulumSim
         for (int i = 0; i < arms.Count; i++)
         {
             //if there are orgins, then they are enforced again / in case they have moved
-            if (orgins != null)
+            if (orgins.Count>0)
             {
                 arms[i][0].orgin = orgins[i];
             }
