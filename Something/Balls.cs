@@ -15,14 +15,14 @@ public class Balls
     List<PendjulumSim> orbits = new List<PendjulumSim>();
 
     Vector2 screen;
-    int armCount;//arm count per ball
+    public int orbitCount;//arm count per ball
     List<Trail> trailList;
 
     //constructor
     public Balls(int amt, int armCount, List<Trail> trailList, Vector2 screen)
     {
         this.screen = screen;
-        this.armCount = armCount;
+        this.orbitCount = armCount;
         this.trailList = trailList;
 
         //adds balls to balls for the amount specified
@@ -66,8 +66,19 @@ public class Balls
                 ballArms[i].RemoveAt(0);
                 ballArms[i].Add(balls[i].position);
             }
-             //acculy updates the orgins of the orbits
+            //acculy updates the orgins of the orbits
             orbits[i].orgins = ballArms[i];
+
+            //incresses the orbit count if there are said to be more in this sim than in the acual orbit sim
+            if (orbits[i].arms.Count<orbitCount)
+            {
+                orbits[i].NewArm(false,balls[i].position);
+            }
+            else if(orbits[i].arms.Count>orbitCount)
+            {
+                trailList.Remove(orbits[i].arms[0][1].trail);
+                orbits[i].arms.RemoveAt(0);
+            }
             //does a update of the penjulum sim of this ball
             orbits[i].Update();
         }
@@ -87,12 +98,12 @@ public class Balls
     {
         List<Vector2> alalathbar = new List<Vector2>();
         Vector2 position = new Vector2(Random.Shared.Next((int)screen.X), Random.Shared.Next((int)screen.X / 2));
-            //adds a ball att a random posistion in the upper half of the screen
+            //adds a ball at a random posistion in the upper half of the screen
             balls.Add(new Ball(10,position , trailList, screen));
             orbits.Add(new PendjulumSim(0, 20, screen, false, null, trailList));
             ballArms.Add(new List<Vector2>());
             //adds the orbits orgins for later creation of the arms
-            for (int j = 0; j < armCount; j++)
+            for (int j = 0; j < orbitCount; j++)
             {
                 //orbits.orgins.Add(balls[balls.Count-1].position);
                 ballArms[ballArms.Count-1].Add(balls[balls.Count-1].position);
@@ -100,6 +111,16 @@ public class Balls
             }
         
         //creats a new penjulum sim with the orgins of the balls positions
+    }
+    public void ViciouslyMurderBall()
+    {
+        for (int i = 0; i < orbitCount; i++)
+        {
+            orbits[0].Amputate();
+        }
+        orbits.RemoveAt(0);
+        trailList.Remove(balls[0].trail);
+        balls.RemoveAt(0);
     }
 }
 

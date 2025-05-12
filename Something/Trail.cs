@@ -7,7 +7,7 @@ namespace Something;
 public class Trail
 {
     //Stores the positions that make up the trail
-    List<Vector2> trail = new();
+    public List<Vector2> trail = new();
 
     //maximum number of points allowed in the trail
     int maxTrailLength = 300;

@@ -59,11 +59,7 @@ public class Menu
             }
             if (Button(new(50,50),new(screen.X/6+70,350),"-"))
             {
-                if (pendjulumSims.arms.Count>0)
-                {
-                    trailList.Remove(pendjulumSims.arms[0][1].trail);
-                    pendjulumSims.arms.RemoveAt(0);
-                }
+                pendjulumSims.Amputate();
             }
 
             TextBox("Ball Simulation",30,new(screen.X/6,500));
@@ -76,26 +72,21 @@ public class Menu
             }
             if (Button(new(50,50),new(screen.X/6+70,550),"-"))
             {
-                if (pendjulumSims.arms.Count>0)
-                {
-                    trailList.Remove(pendjulumSims.arms[0][1].trail);
-                    pendjulumSims.arms.RemoveAt(0);
-                }
+                ballSims.ViciouslyMurderBall();
             }
 
-            TextBox("Ball Orbits Count",20,new(screen.X/6,525));
+            TextBox("Ball Orbits Count",20,new(screen.X/6,625));
 
-            //TextBox(""+ballSims./ballSims.balls.Count,50,new(screen.X/6,550));
-            if (Button(new(50,50),new(screen.X/6-70,550),"+"))
+            TextBox(""+ballSims.orbitCount,50,new(screen.X/6,650));
+            if (Button(new(50,50),new(screen.X/6-70,650),"+"))
             {
-                ballSims.NewBall();
+                ballSims.orbitCount++;
             }
-            if (Button(new(50,50),new(screen.X/6+70,550),"-"))
+            if (Button(new(50,50),new(screen.X/6+70,650),"-"))
             {
-                if (pendjulumSims.arms.Count>0)
+                if (ballSims.orbitCount>0)
                 {
-                    trailList.Remove(pendjulumSims.arms[0][1].trail);
-                    pendjulumSims.arms.RemoveAt(0);
+                    ballSims.orbitCount--;
                 }
             }
         }

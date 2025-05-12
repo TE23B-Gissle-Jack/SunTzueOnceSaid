@@ -17,13 +17,14 @@ public class PendjulumSim
 
     Vector2 screen;
     List<Trail> trailList;
+    List<Trail> deadTrails;
     bool random;
 
     //constructor
     public PendjulumSim(int amt, int leangth, Vector2 screen, bool random, List<Vector2> orgins, List<Trail> trailList)
     {
         //stores the origins provided when creating the simulation
-        if(orgins!=null)this.orgins = orgins;
+        if (orgins != null) this.orgins = orgins;
         this.screen = screen;
         this.trailList = trailList;
         this.random = random;
@@ -31,7 +32,7 @@ public class PendjulumSim
         //loop to make the specified amount of double penjulums
         for (int i = 0; i < amt; i++)
         {
-            NewArm(false,orgins[i]);
+            NewArm(false, orgins[i]);
         }
     }
 
@@ -48,7 +49,7 @@ public class PendjulumSim
         for (int i = 0; i < arms.Count; i++)
         {
             //if there are orgins, then they are enforced again / in case they have moved
-            if (orgins.Count>0)
+            if (orgins.Count > 0)
             {
                 arms[i][0].orgin = orgins[i];
             }
@@ -80,10 +81,10 @@ public class PendjulumSim
         }
     }
 
-    public void NewArm(bool independant,Vector2 orgin)
+    public void NewArm(bool independant, Vector2 orgin)
     {
-        if(independant)orgins.Add(orgin);
-        
+        if (independant) orgins.Add(orgin);
+
         Vector2 position;
 
         //not nececary
@@ -109,6 +110,14 @@ public class PendjulumSim
 
         //adds the two arm segments as an array(parent first) in the list arms
         arms.Add([arm, arm2]);
+    }
+    public void Amputate()
+    {
+        if (arms.Count > 0)
+        {
+            trailList.Remove(arms[0][1].trail);
+            arms.RemoveAt(0);
+        }
     }
 }
 

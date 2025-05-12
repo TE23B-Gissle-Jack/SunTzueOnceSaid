@@ -20,7 +20,7 @@ public class Ball
     Vector2 screen;
 
     //this balls trail
-    Trail trail;
+    public Trail trail;
 
     //constructor
     public Ball(int radius, Vector2 location,List<Trail> trailList, Vector2 window)
