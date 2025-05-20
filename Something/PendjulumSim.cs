@@ -21,12 +21,13 @@ public class PendjulumSim
     bool random;
 
     //constructor
-    public PendjulumSim(int amt, int leangth, Vector2 screen, bool random, List<Vector2> orgins, List<Trail> trailList)
+    public PendjulumSim(int amt, int leangth, Vector2 screen, bool random, List<Vector2> orgins, List<Trail>[] trailList)
     {
         //stores the origins provided when creating the simulation
         if (orgins != null) this.orgins = orgins;
         this.screen = screen;
-        this.trailList = trailList;
+        this.trailList = trailList[0];
+        this.deadTrails = trailList[1];
         this.random = random;
 
         //loop to make the specified amount of double penjulums
@@ -51,7 +52,7 @@ public class PendjulumSim
             //if there are orgins, then they are enforced again / in case they have moved
             if (orgins.Count > 0)
             {
-                arms[i][0].orgin = orgins[i];
+                arms[i][0].orgin = orgins[i];//problem child
             }
 
             //runs calculations and update while game is not paused
@@ -83,7 +84,7 @@ public class PendjulumSim
 
     public void NewArm(bool independant, Vector2 orgin)
     {
-        if (independant) orgins.Add(orgin);
+        if (!independant) orgins.Add(orgin);
 
         Vector2 position;
 
@@ -104,17 +105,18 @@ public class PendjulumSim
 
 
         //makes the first arm using the position/orgin and gives it a role of parent
-        ArmSegment arm = new ArmSegment(position, 100, null, 1, "parent", trailList);
+        ArmSegment arm = new ArmSegment(position, armLeangth, null, 1, "parent", trailList);
         //makes another amr as child wich orgin is overtien later to be parents moving point
-        ArmSegment arm2 = new ArmSegment(position, 100, arm, 2, "child", trailList);
+        ArmSegment arm2 = new ArmSegment(position, armLeangth, arm, 2, "child", trailList);
 
-        //adds the two arm segments as an array(parent first) in the list arms
+        //adds the two arm segments as an array(parent first) in the list "arms"
         arms.Add([arm, arm2]);
     }
     public void Amputate()
     {
         if (arms.Count > 0)
         {
+            deadTrails.Add(arms[0][1].trail);
             trailList.Remove(arms[0][1].trail);
             arms.RemoveAt(0);
         }

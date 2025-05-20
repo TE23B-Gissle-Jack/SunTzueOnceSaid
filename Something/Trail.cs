@@ -37,12 +37,13 @@ public class Trail
     public void Add(Vector2 position)
     {
         trail.Add(position);
+        if (trail.Count > maxTrailLength) trail.RemoveAt(0);
     }
 
     //keeps the trail length by removing the oldest points if it exceeds the max limit
     public void update()
     {
-        if (trail.Count > maxTrailLength) trail.RemoveAt(0);
+        
     }
 
     //Draws the trail using fading color
@@ -68,7 +69,7 @@ public class Trail
             Raylib.DrawLineEx(trail[i - 1], trail[i], size, fade);
         }
     }
-
+    
     //decides whether the trail segment is to far apart (broken)
     public bool TrailBreak(Vector2 point1, Vector2 point2)
     {
